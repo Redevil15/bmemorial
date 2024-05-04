@@ -1,14 +1,21 @@
 import { Footer } from "flowbite-react";
 import { BsFacebook, BsGithub, BsInstagram } from "react-icons/bs";
 
-export const FooterComponent = () => {
+interface FooterComponentProps {
+  className?: string
+}
+
+
+export const FooterComponent = ({
+  className
+}: FooterComponentProps) => {
   return (
     <Footer
       container
       className="border border-t-8 border-yellow-500"
     >
       <div
-        className="w-full max-w-7xl mx-auto"
+        className={className}
       >
         <div className="w-full sm:flex sm:items-center sm:justify-between">
           <Footer.Copyright

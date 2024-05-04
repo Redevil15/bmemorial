@@ -4,7 +4,13 @@ import { toggleTheme } from "../redux/theme/themeSlice";
 import { RootState } from "../redux/store";
 import { FaMoon, FaSun } from "react-icons/fa";
 
-export default function HeaderComponent() {
+interface HeaderComponentProps {
+  className?: string
+}
+
+export default function HeaderComponent({
+  className
+}: HeaderComponentProps) {
   const dispatch = useDispatch();
   const currentTheme = useSelector((state: RootState) => state.theme.theme);
 
@@ -13,7 +19,8 @@ export default function HeaderComponent() {
   return (
     <Navbar className="border-b-2">
       <div
-        className='self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white'
+        /* className='self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white' */
+        className={className}
       >
 
         <span
