@@ -11,6 +11,7 @@ export const BodyComponent = ({
   className
 }: BodyComponentProps) => {
   const [errorMessage, setErrorMessage] = useState('');
+  const [files, setFiles] = useState<FileList | null>(null)
 
   const filePickerRef = useRef<HTMLInputElement>(null);
 
@@ -27,8 +28,37 @@ export const BodyComponent = ({
       event.target.value = '';
     } else {
       setErrorMessage('');
+      setFiles(event.target.files);
     }
   };
+
+  const handleUploadFiles = async () => {
+    if (!files) {
+      setErrorMessage('Please select files to upload')
+      return
+    }
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('images', files[i])
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+      } else {
+        throw new Error(data.error)
+      }
+    } catch (error: any) {
+      setErrorMessage(error.message)
+    }
+  }
   return (
     <div
       className={className}
@@ -60,6 +90,7 @@ export const BodyComponent = ({
               className="hidden"
               id="images"
               onChange={handleFileChange}
+              multiple
             />
             <Button
               className="bg-[#c19a5b] text-white"
@@ -68,6 +99,13 @@ export const BodyComponent = ({
             >
               Browse files
               <MdOutlineImageSearch className="ml-2 h-5 w-5" />
+            </Button>
+            <Button
+              className="bg-[#c19a5b] text-white ml-4"
+              pill
+              onClick={handleUploadFiles}
+            >
+              Upload files
             </Button>
           </div>
           {errorMessage && (
