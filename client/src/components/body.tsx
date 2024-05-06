@@ -1,64 +1,78 @@
 import { Alert, Button } from "flowbite-react";
 import { MdOutlineImageSearch } from "react-icons/md";
-import { useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import axios from "axios";
 
 interface BodyComponentProps {
   className?: string
+}
+
+interface ImageData {
+  image: string[];
 }
 
 
 export const BodyComponent = ({
   className
 }: BodyComponentProps) => {
-  const [errorMessage, setErrorMessage] = useState('');
-  const [files, setFiles] = useState<FileList | null>(null)
 
-  const filePickerRef = useRef<HTMLInputElement>(null);
 
-  const handleBrowseFiles = () => {
-    // Funcionalidad para poder seleccionar 
-    if (filePickerRef.current) {
-      filePickerRef.current.click();
-    }
-  };
+  const [files, setFiles] = useState<File[]>([])
+  const [imagesData, setImagesData] = useState<string[]>([])
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 10) {
-      setErrorMessage('You can only upload up to 10 photos');
-      event.target.value = '';
+  useEffect(() => {
+    getImages()
+  }, [])
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {  // Check if files are not null
+      const fileList = e.target.files; // Get the FileList object
+      const selectedFiles = Array.from(fileList).slice(0, 10); // Convert FileList to Array and slice it
+      setFiles(selectedFiles); // Update state
     } else {
-      setErrorMessage('');
-      setFiles(event.target.files);
+      console.log('No files selected');
     }
   };
 
-  const handleUploadFiles = async () => {
-    if (!files) {
-      setErrorMessage('Please select files to upload')
-      return
-    }
 
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append('images', files[i])
-    }
-
-    try {
-      const response = await fetch('http://localhost:3000/upload', {
-        method: 'POST',
-        body: formData
+  const handleUpload = (e: any) => {
+    if (files.length > 0) {
+      console.log(files)
+      const formData = new FormData()
+      files.forEach(file => {
+        formData.append('files', file)
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        console.log(data);
-      } else {
-        throw new Error(data.error)
-      }
-    } catch (error: any) {
-      setErrorMessage(error.message)
+      axios.post("http://localhost:3001/upload", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+        .then(res => console.log("Response: ", res))
+        .catch(err => console.log("Error: ", err))
+    } else {
+      console.log('No file selected')
     }
+  };
+
+  // Get all images
+  const getImages = () => {
+    axios.get("http://localhost:3001/getImage", {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => {
+        console.log("Response: ", res)
+        setImagesData(res.data.map((item: ImageData) => item.image.map(img => `http://localhost:3001/images/${img.replace(/^public\\images\\/, '')}`)).flat())
+        console.log(imagesData)
+      })
+      .catch(err => console.log("Error: ", err)
+      )
   }
+
+
+
   return (
     <div
       className={className}
@@ -84,37 +98,37 @@ export const BodyComponent = ({
             className="my-10 flex justify-center"
           >
             <input
-              ref={filePickerRef}
               type="file"
+              id="file"
+              // ref={filePickerRef}
               accept="image/*"
-              className="hidden"
-              id="images"
-              onChange={handleFileChange}
               multiple
+              // className="hidden"
+              onChange={handleFileChange}
             />
-            <Button
+            {/* <Button
               className="bg-[#c19a5b] text-white"
               pill
               onClick={handleBrowseFiles}
             >
               Browse files
               <MdOutlineImageSearch className="ml-2 h-5 w-5" />
-            </Button>
+            </Button> */}
             <Button
               className="bg-[#c19a5b] text-white ml-4"
               pill
-              onClick={handleUploadFiles}
+              onClick={handleUpload}
             >
               Upload files
             </Button>
           </div>
-          {errorMessage && (
+          {/* {errorMessage && (
             <Alert
               color='failure'
             >
               {errorMessage}
             </Alert>
-          )}
+          )} */}
         </div>
       </div>
     </div>

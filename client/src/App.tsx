@@ -69,12 +69,12 @@ export default function App() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* <HeaderComponent className="flex-shrink-0" />
+      <HeaderComponent className="flex-shrink-0" />
       <BodyComponent className="flex-grow mt-8" />
-      <FooterComponent className="flex-shrink-0 mb-8" /> */}
+      <FooterComponent className="flex-shrink-0 mb-8" />
 
 
-      <input
+      {/* <input
         type="file"
         id="file"
         accept="image/*"
@@ -87,6 +87,7 @@ export default function App() {
         Upload
       </button>
 
+    */}
       <div>
         <button onClick={getImages}>Get Images</button>
         <div>
@@ -95,7 +96,6 @@ export default function App() {
           ))}
         </div>
       </div>
-
     </div>
   )
 }
