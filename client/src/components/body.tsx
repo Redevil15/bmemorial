@@ -2,6 +2,7 @@ import { Alert, Button } from "flowbite-react";
 import { MdOutlineImageSearch } from "react-icons/md";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 interface BodyComponentProps {
   className?: string
@@ -10,7 +11,6 @@ interface BodyComponentProps {
 interface ImageData {
   image: string[];
 }
-
 
 export const BodyComponent = ({
   className
@@ -54,8 +54,14 @@ export const BodyComponent = ({
           'Content-Type': 'multipart/form-data'
         }
       })
-        .then(res => console.log("Response: ", res))
-        .catch(err => console.log("Error: ", err))
+        .then(res => {
+          // show toast success notificacion
+          toast.success('Images uploaded successfully!!')
+        })
+        .catch(err => {
+          toast.error("Oops... algo salió mal, F")
+          console.log("Error: ", err)
+        })
     } else {
       console.log('No file selected')
     }
@@ -69,9 +75,7 @@ export const BodyComponent = ({
       }
     })
       .then(res => {
-        console.log("Response: ", res)
         setImagesData(res.data.map((item: ImageData) => item.image.map(img => `http://localhost:3001/images/${img.replace(/^public\\images\\/, '')}`)).flat())
-        console.log(imagesData)
       })
       .catch(err => console.log("Error: ", err)
       )
