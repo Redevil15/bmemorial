@@ -41,6 +41,11 @@ export default function App() {
     <div className="flex flex-col min-h-screen">
       <HeaderComponent className="flex-shrink-0" />
       <BodyComponent className="flex-grow mt-8" />
+      {imagesData.length === 0 && (
+        <div className="flex justify-center items-center h-64">
+          <h1 className="text-2xl text-gray-500">No images to display</h1>
+        </div>
+      )}
       <ImagesList
         images={imagesData}
       />
