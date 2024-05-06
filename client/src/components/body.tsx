@@ -24,6 +24,11 @@ export const BodyComponent = ({
     getImages()
   }, [])
 
+  const handleBrowseFiles = () => {
+    const fileInput = document.getElementById('file');
+    fileInput?.click();
+  };
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {  // Check if files are not null
       const fileList = e.target.files; // Get the FileList object
@@ -36,6 +41,7 @@ export const BodyComponent = ({
 
 
   const handleUpload = (e: any) => {
+    setFiles([])
     if (files.length > 0) {
       console.log(files)
       const formData = new FormData()
@@ -103,21 +109,22 @@ export const BodyComponent = ({
               // ref={filePickerRef}
               accept="image/*"
               multiple
-              // className="hidden"
+              className="hidden"
               onChange={handleFileChange}
             />
-            {/* <Button
+            <Button
               className="bg-[#c19a5b] text-white"
               pill
               onClick={handleBrowseFiles}
             >
-              Browse files
+              {files.length === 0 ? 'Browse files' : `${files.length} files selected`}
               <MdOutlineImageSearch className="ml-2 h-5 w-5" />
-            </Button> */}
+            </Button>
             <Button
               className="bg-[#c19a5b] text-white ml-4"
               pill
               onClick={handleUpload}
+              disabled={files.length === 0}
             >
               Upload files
             </Button>
