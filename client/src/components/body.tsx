@@ -1,34 +1,88 @@
 import { Alert, Button } from "flowbite-react";
 import { MdOutlineImageSearch } from "react-icons/md";
-import { useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 interface BodyComponentProps {
   className?: string
 }
 
+interface ImageData {
+  image: string[];
+}
 
 export const BodyComponent = ({
   className
 }: BodyComponentProps) => {
-  const [errorMessage, setErrorMessage] = useState('');
 
-  const filePickerRef = useRef<HTMLInputElement>(null);
+
+  const [files, setFiles] = useState<File[]>([])
+  const [imagesData, setImagesData] = useState<string[]>([])
+
+  useEffect(() => {
+    getImages()
+  }, [])
 
   const handleBrowseFiles = () => {
-    // Funcionalidad para poder seleccionar 
-    if (filePickerRef.current) {
-      filePickerRef.current.click();
+    const fileInput = document.getElementById('file');
+    fileInput?.click();
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {  // Check if files are not null
+      const fileList = e.target.files; // Get the FileList object
+      const selectedFiles = Array.from(fileList).slice(0, 10); // Convert FileList to Array and slice it
+      setFiles(selectedFiles); // Update state
+    } else {
+      console.log('No files selected');
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 10) {
-      setErrorMessage('You can only upload up to 10 photos');
-      event.target.value = '';
+
+  const handleUpload = (e: any) => {
+    setFiles([])
+    if (files.length > 0) {
+      console.log(files)
+      const formData = new FormData()
+      files.forEach(file => {
+        formData.append('files', file)
+      });
+
+      axios.post("http://localhost:3001/upload", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+        .then(res => {
+          // show toast success notificacion
+          toast.success('Images uploaded successfully!!')
+        })
+        .catch(err => {
+          toast.error("Oops... algo salió mal, F")
+          console.log("Error: ", err)
+        })
     } else {
-      setErrorMessage('');
+      console.log('No file selected')
     }
   };
+
+  // Get all images
+  const getImages = () => {
+    axios.get("http://localhost:3001/getImage", {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => {
+        setImagesData(res.data.map((item: ImageData) => item.image.map(img => `http://localhost:3001/images/${img.replace(/^public\\images\\/, '')}`)).flat())
+      })
+      .catch(err => console.log("Error: ", err)
+      )
+  }
+
+
+
   return (
     <div
       className={className}
@@ -54,11 +108,12 @@ export const BodyComponent = ({
             className="my-10 flex justify-center"
           >
             <input
-              ref={filePickerRef}
               type="file"
+              id="file"
+              // ref={filePickerRef}
               accept="image/*"
+              multiple
               className="hidden"
-              id="images"
               onChange={handleFileChange}
             />
             <Button
@@ -66,17 +121,25 @@ export const BodyComponent = ({
               pill
               onClick={handleBrowseFiles}
             >
-              Browse files
+              {files.length === 0 ? 'Browse files' : `${files.length} files selected`}
               <MdOutlineImageSearch className="ml-2 h-5 w-5" />
             </Button>
+            <Button
+              className="bg-[#c19a5b] text-white ml-4"
+              pill
+              onClick={handleUpload}
+              disabled={files.length === 0}
+            >
+              Upload files
+            </Button>
           </div>
-          {errorMessage && (
+          {/* {errorMessage && (
             <Alert
               color='failure'
             >
               {errorMessage}
             </Alert>
-          )}
+          )} */}
         </div>
       </div>
     </div>
