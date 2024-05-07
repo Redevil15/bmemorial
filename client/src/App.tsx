@@ -27,13 +27,15 @@ export default function App() {
       }
     })
       .then(res => {
-        console.log("Response: ", res)
-        setImagesData(res.data.map((item: ImageData) => item.image.map(img => `http://localhost:3001/images/${img.replace(/^public\\images\\/, '')}`)).flat())
+        console.log("Response: ", res);
+        const formattedImages = res.data.map((item: ImageData) =>
+          item.image.map(img => `http://localhost:3001/images/${img.replace(/^public\\images\\/, '')}`)
+        ).flat();
+        setImagesData(formattedImages);
         console.log(imagesData)
       })
-      .catch(err => console.log("Error: ", err)
-      )
-  }
+      .catch(err => console.log("Error: ", err));
+  };
 
 
 

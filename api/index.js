@@ -8,6 +8,9 @@ const app = express();
 
 app.use(cors());
 
+app.use(express.static('public'))
+
+
 app.listen(3001, () => {
   console.log('Server is running on port 3000!!');
 });
