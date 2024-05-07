@@ -20,9 +20,6 @@ export const BodyComponent = ({
   const [files, setFiles] = useState<File[]>([])
   const [imagesData, setImagesData] = useState<string[]>([])
 
-  useEffect(() => {
-    getImages()
-  }, [])
 
   const handleBrowseFiles = () => {
     const fileInput = document.getElementById('file');
@@ -49,7 +46,7 @@ export const BodyComponent = ({
         formData.append('files', file)
       });
 
-      axios.post("http://localhost:3001/upload", formData, {
+      axios.post("http://localhost:3001/api/images/upload", formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -66,20 +63,6 @@ export const BodyComponent = ({
       console.log('No file selected')
     }
   };
-
-  // Get all images
-  const getImages = () => {
-    axios.get("http://localhost:3001/getImage", {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(res => {
-        setImagesData(res.data.map((item: ImageData) => item.image.map(img => `http://localhost:3001/images/${img.replace(/^public\\images\\/, '')}`)).flat())
-      })
-      .catch(err => console.log("Error: ", err)
-      )
-  }
 
 
 

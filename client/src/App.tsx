@@ -21,7 +21,7 @@ export default function App() {
 
   // Get all images
   const getImages = () => {
-    axios.get("http://localhost:3001/getImage", {
+    axios.get("http://localhost:3001/api/images/getImage", {
       headers: {
         'Content-Type': 'application/json'
       }

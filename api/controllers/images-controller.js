@@ -1,5 +1,6 @@
 const ImagesModel = require('../models/images');
 
+
 exports.uploadImages = (req, res) => {
   // Check if the files were uploaded successfully
   if (!req.files || req.files.length === 0) {
@@ -21,6 +22,16 @@ exports.uploadImages = (req, res) => {
     });
 };
 
-console.log('uploadImages is a: ', typeof exports.uploadImages);
+exports.getImage = (req, res) => {
+  ImagesModel.find()
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      console.error("Error during fetching images from the database:", err);
+      res.status(500).send("Error fetching images from the database.");
+    });
+};
+
 
 
